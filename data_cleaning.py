@@ -30,7 +30,7 @@ df.info()
 print(df.shape)
 
 
-n = df.isnull.sum().sum() #checking for null values
+n = df.isnull().sum().sum() #checking for null values
 print('There is',n,'null values in our data')
 
 print('Column wise null values =',df.isnull().sum())
