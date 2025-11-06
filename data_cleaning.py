@@ -8,22 +8,42 @@ Original file is located at
 """
 
 import pandas as pd
+try:
+    link = input('Enter csv link of data = ')
+    data = pd.read_csv(link)
+    print("✅ File loaded successfully!")
+    df = pd.DataFrame(data)
+except FileNotFoundError:
+    print("❌ Error: The file was not found. Please check the path and try again.")
 
-link = input('Enter csv link of data = ')
-data = pd.read_csv(link)
-df = pd.DataFrame(data)
+except pd.errors.EmptyDataError:
+    print("❌ Error: The file is empty. Upload a dataset with data inside.")
+
+except pd.errors.ParserError:
+    print("❌ Error: The file could not be parsed. Check if it's a valid CSV.")
+
+except Exception as e:
+    print(f"⚠️ Unexpected error occurred: {e}")
+
+print("Data before cleaning :")
+df.info()
+print(df.shape)
+
 
 n = df.isnull.sum().sum() #checking for null values
 print('There is',n,'null values in our data')
 
 print('Column wise null values =',df.isnull().sum())
 
-df.duplicated()  #checking for duplicate values in our data
-print('There is total',df.duplicated().sum(),'duplicates in our dataset')
+check = df.duplicated()  #checking for duplicate values in our data
+
 
 df[df.duplicated()] # viewing duplicate rows
-df.drop_duplicates(inplace=True)
-
+num_duplicates = df.duplicated().sum()
+if num_duplicates > 0:
+    print(f"Found {num_duplicates} duplicates. Dropping them.")
+    df.drop_duplicates(inplace=True)
+# Dropped duplicate values
 
 ask = input('You want to drop rows which contain null value yes/no = ').lower() #asking user what they want with null value rows
 
@@ -41,3 +61,35 @@ elif ask=='no':
         print('Invalid choice')
 else:
     print('Invalid choice')
+# Removing Special characters from numeric column so statistics operation can be performed
+print("🧾 Cleaning numeric columns...")
+
+for col in df.columns:
+    if df[col].dtype == 'object':
+        try:
+            df[col] = df[col].replace('[^0-9.]', '', regex=True).astype(float)
+        except:
+            pass
+
+print("Data after cleaning")
+df.info()
+print(df.shape)
+
+#saving cleaned data
+save_name = input("Enter name of cleaned file without extension : ")
+file_path = f"{save_name}.csv"
+
+try:
+    with open(file_path, 'r'):
+        overwrite = input(f"⚠️ File '{file_path}' exists. Overwrite? (y/n): ").strip().lower()
+        if overwrite != 'y':
+            print("❌ File not saved.")
+        else:
+            df.to_csv(file_path, index=False)
+            print(f"✅ Saved as '{file_path}'")
+except FileNotFoundError:
+    df.to_csv(file_path, index=False)
+    print(f"✅ Saved as '{file_path}'")
+
+print("Thanks!!!, For using our script......")
+
