@@ -28,14 +28,22 @@ except Exception as e:
 print("Data before cleaning :")
 df.info()
 print(df.shape)
+# Removing Special characters from numeric column so statistics operation can be performed
+print("🧾 Cleaning numeric columns...")
 
+for col in df.columns:
+    if df[col].dtype == 'object':
+        try:
+            df[col] = df[col].replace('[^0-9.]', '', regex=True).astype(float)
+        except:
+            pass
 
 n = df.isnull().sum().sum() #checking for null values
 print('There is',n,'null values in our data')
 
 print('Column wise null values =',df.isnull().sum())
 
-check = df.duplicated()  #checking for duplicate values in our data
+df.duplicated()  #checking for duplicate values in our data
 
 
 df[df.duplicated()] # viewing duplicate rows
@@ -44,6 +52,8 @@ if num_duplicates > 0:
     print(f"Found {num_duplicates} duplicates. Dropping them.")
     df.drop_duplicates(inplace=True)
 # Dropped duplicate values
+
+
 
 ask = input('You want to drop rows which contain null value yes/no = ').lower() #asking user what they want with null value rows
 
@@ -61,15 +71,7 @@ elif ask=='no':
         print('Invalid choice')
 else:
     print('Invalid choice')
-# Removing Special characters from numeric column so statistics operation can be performed
-print("🧾 Cleaning numeric columns...")
 
-for col in df.columns:
-    if df[col].dtype == 'object':
-        try:
-            df[col] = df[col].replace('[^0-9.]', '', regex=True).astype(float)
-        except:
-            pass
 
 print("Data after cleaning")
 df.info()
