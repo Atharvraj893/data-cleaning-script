@@ -60,13 +60,15 @@ ask = input('You want to drop rows which contain null value yes/no = ').lower() 
 if ask=='yes':
     df.dropna(inplace=True)
 elif ask=='no':
+
     imp = int(input("How do you want to fill missing values? (1 = mean, 2 = median, 3 = mode)"))
-    if imp==1:
-        df.fillna(df.mean(),inplace=True)
-    elif imp==2:
-        df.fillna(df.median(),inplace=True)
-    elif imp==3:
-        df.fillna(df.mode(),inplace=True)
+
+    if imp == 1:
+        df.fillna(df.select_dtypes(include='number').mean(), inplace=True)
+    elif imp == 2:
+        df.fillna(df.select_dtypes(include='number').median(), inplace=True)
+    elif imp == 3:
+        df.fillna(df.mode().iloc[0], inplace=True)  # Use first row of mode result
     else:
         print('Invalid choice')
 else:
